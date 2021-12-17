@@ -2,30 +2,29 @@ import { Cart } from './classes/cart';
 import { Product } from './classes/product';
 import { PRODUCTS } from './data';
 
+export interface State {
+    currentProduct?: Product;
+    quantity?: number;
+    cart: Cart;
+    totalPrice?: number;
+
+    returnPressed?: boolean;
+    okPressed?: boolean;
+    payPressed?: boolean;
+    productNotFound?: boolean;
+
+    paidAmount?: number;
+    paidMethod?: string;
+
+    isFinished?: boolean;
+}
 export class Logic {
     currentState: string = 'UNKNOWN'
-    state: {
-        method?: string;
-        currentProduct?: Product;
-        quantity?: number;
-        cart: Cart;
-        totalPrice?: number;
+    state: State;
 
-        returnPressed?: boolean;
-        okPressed?: boolean;
-        payPressed?: boolean;
-        productNotFound?: boolean;
-
-        paidAmount?: number;
-        paidMethod?: string;
-
-        isFinished?: boolean;
-    }
-
-    constructor() {
+    constructor(private observer: Function) {
         this.state = {
             cart: new Cart(),
-            method: 'CASH'
         }
 
         this.transition()
@@ -59,6 +58,7 @@ export class Logic {
         if (this.currentState === from && condition) {
             this.currentState = to
             if (callback) callback.bind(this)()
+            this.observer(this.state)
             console.debug(`${from} >>> ${to}`)
         }
     }
@@ -132,7 +132,7 @@ export class Logic {
         this.state.cart.returnProduct(this.state.currentProduct!, this.state.quantity!)
         this.state.totalPrice = this.state.cart.getPrice()
     }
-    
+
     waitForReturnScanCallback() {
         this.state.returnPressed = undefined
     }
