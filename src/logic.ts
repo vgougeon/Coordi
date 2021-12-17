@@ -58,7 +58,7 @@ export class Logic {
         if (this.currentState === from && condition) {
             this.currentState = to
             if (callback) callback.bind(this)()
-            this.observer(this.state)
+            this.observer(this.state, this.currentState)
             console.debug(`${from} >>> ${to}`)
         }
     }
