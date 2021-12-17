@@ -60,6 +60,7 @@ export class Logic {
             if (callback) callback.bind(this)()
             this.observer(this.state, this.currentState)
             console.debug(`${from} >>> ${to}`)
+            this.transition()
         }
     }
 
