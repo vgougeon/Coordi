@@ -1,89 +1,154 @@
 import { Cart } from './classes/cart';
 import { Product } from './classes/product';
-import { ProductCart } from './classes/productCart';
 import { PRODUCTS } from './data';
-import { StateName } from "./stateManager"
 
 export class Logic {
-  currentState: StateName = StateName.WaitForScan;
-  state : {
-    return?: boolean;
-    method?: string;
-    currentProduct?: Product;
-    cart: Cart;
-    totalPrice?: number;
-  }
+    currentState: string = 'UNKNOWN'
+    state: {
+        method?: string;
+        currentProduct?: Product;
+        quantity?: number;
+        cart: Cart;
+        totalPrice?: number;
 
-  constructor() {
-    this.state = {
-      cart: new Cart()
+        returnPressed?: boolean;
+        okPressed?: boolean;
+        payPressed?: boolean;
+        productNotFound?: boolean;
+
+        paidAmount?: number;
+        paidMethod?: string;
+
+        isFinished?: boolean;
     }
-  }
 
-  enterCode(code: number) {
-    const product = PRODUCTS.find(p => p.code === code)
-    if(product){
-      this.state.currentProduct = product;
-    } 
-    else this.productNotFound(code)
-  }
+    constructor() {
+        this.state = {
+            cart: new Cart(),
+            method: 'CASH'
+        }
 
-  scanCode(code: number) {
-    const product = PRODUCTS.find(p => p.code === code)
-    if(product){
-      this.state.currentProduct = product;
-      console.log('*** Added product ***');
-      console.log(` REF ${product.code}\n Name ${product.name} \n Price ${product.price} \n`);
-    } 
-    else this.productNotFound(code)
-  }
-
-  productNotFound(code: number){
-    console.error(`*** Product not found *** \n REF: ${code}`)
-  }
-
-  enterQuantity(qty: number){
-    if(this.state.return) {
-      this.state.cart.returnProduct(this.state.currentProduct!, qty)
+        this.transition()
+        setInterval(this.transition.bind(this), 50)
     }
-    else this.state.cart.addProduct(this.state.currentProduct!, qty)
 
-    delete this.state.return
-  }
+    transition() {
+        const c = this.checkState.bind(this)
+        //ADD
+        c('UNKNOWN', 'WAIT_FOR_SCAN', true)
+        c('WAIT_FOR_SCAN', 'WAIT_QUANTITY', this.isProductScanned())
+        c('WAIT_FOR_SCAN', 'WAIT_FOR_RETURN_SCAN', this.isReturnPressed(), this.waitForReturnScanCallback)
+        c('WAIT_FOR_SCAN', 'UNKNOWN_PRODUCT', this.isUnknownProduct(), this.unknownProductCallback)
+        c('WAIT_QUANTITY', 'UPDATE_CART', this.isQuantityEntered(), this.updateCartCallback)
+        c('UPDATE_CART', 'UNKNOWN', true, this.finishCallback)
+        //RETURN
+        c('WAIT_FOR_RETURN_SCAN', 'UNKNOWN_PRODUCT', this.isUnknownProduct(), this.unknownProductCallback)
+        c('WAIT_FOR_RETURN_SCAN', 'WAIT_RETURN_QUANTITY', this.isProductScanned())
+        c('WAIT_RETURN_QUANTITY', 'UPDATE_CART_RETURN', this.isQuantityEntered(), this.updateCartReturnCallback)
+        c('UPDATE_CART_RETURN', 'UNKNOWN', true, this.finishCallback)
+        //ERRORS
+        c('UNKNOWN_PRODUCT', 'UNKNOWN', this.isOkPressed(), this.finishCallback)
+        //PAY
+        c('WAIT_FOR_SCAN', 'PAY', this.isPaySelectedAndAmount())
+        c('PAY', 'PAY_UPDATE_TOTAL', this.didPay(), this.payUpdateTotalCallback)
+        c('PAY', 'ORDER_FINISH', this.isPayComplete())
+        c('PAY_UPDATE_TOTAL', 'PAY', true)
+    }
 
-  pressOkOnError(){
-    console.log('Cick OK on modal error')
-  }
+    checkState(from: string, to: string, condition: boolean, callback?: Function) {
+        if (this.currentState === from && condition) {
+            this.currentState = to
+            if (callback) callback.bind(this)()
+            console.debug(`${from} >>> ${to}`)
+        }
+    }
 
-  payment(){
-    this.state.totalPrice = this.state.cart.getPrice()
-    console.log(`initiate payment, total price is ${ this.state.totalPrice }`);
-    console.log(this.state.cart.products.map(p => `${p.quantity} unité(s) de ${p.product.name}`).join('\n'))
-  }
+    scan(code: number) {
+        this.state.currentProduct = PRODUCTS.find(p => p.code === code) || undefined
+        if (!this.state.currentProduct) this.state.productNotFound = true
+    }
+    quantity(amount: number) { this.state.quantity = amount; }
+    pressReturn() { this.state.returnPressed = true; }
+    pressOk() { this.state.okPressed = true; }
+    pressPay() { this.state.payPressed = true; }
+    pay(amount: number, method: string) {
+        this.state.paidAmount = amount;
+        this.state.paidMethod = method;
+    }
 
-  selectPaymentMethod(method: string){
-    this.state.method = method
-  }
+    //#region CONDITIONS
+    didPay() {
+        if (this.state.paidAmount && this.state.paidMethod) return true
+        return false
+    }
 
-  pay(amount: number) {
-    if(this.state.method === 'CASH') this.payWithCash(amount)
-    else this.payWithCB(amount)
-  }
+    isPayComplete() {
+        if ((this.state.totalPrice || 0) <= 0) return true
+        else return false
+    }
 
-  payWithCash(amount: number){
-    console.log(this.state.totalPrice)
-    this.state.totalPrice = (this.state.totalPrice || 0) - amount;
-    console.log(`Left to pay : ${this.state.totalPrice}`)
-  }
+    isReturnPressed() {
+        return !!this.state.returnPressed
+    }
 
-  payWithCB(amount: number){
-    console.log(this.state.totalPrice)
-    this.state.totalPrice = Math.(this.state.totalPrice || 0) - amount;
-    console.log(`Left to pay : ${this.state.totalPrice}`)
-  }
+    isOkPressed() {
+        return !!this.state.okPressed
+    }
 
-  returnProduct(){
-    this.state.return = true
-  }
+    isPaySelectedAndAmount() {
+        if (this.state.payPressed && (this.state.totalPrice || 0) > 0) return true
+        return false
+    }
+
+    isUnknownProduct() {
+        return !!this.state.productNotFound
+    }
+
+    isProductScanned() {
+        if (this.state.currentProduct) return true
+        else return false
+    }
+
+    isQuantityEntered() {
+        if (this.state.quantity !== undefined) return true
+        else return false
+    }
+    //#endregion CONDTIONS
+
+    //#region CALLBACKS
+    finishCallback() {
+        this.state.currentProduct = undefined;
+        this.state.quantity = undefined;
+        this.state.okPressed = undefined;
+        this.state.isFinished = true
+    }
+
+    updateCartCallback() {
+        this.state.cart.addProduct(this.state.currentProduct!, this.state.quantity!)
+        this.state.totalPrice = this.state.cart.getPrice()
+    }
+
+    updateCartReturnCallback() {
+        this.state.cart.returnProduct(this.state.currentProduct!, this.state.quantity!)
+        this.state.totalPrice = this.state.cart.getPrice()
+    }
+    
+    waitForReturnScanCallback() {
+        this.state.returnPressed = undefined
+    }
+
+    unknownProductCallback() {
+        this.state.productNotFound = undefined
+    }
+
+    payUpdateTotalCallback() {
+        this.state.totalPrice! -= this.state.paidAmount || 0
+        this.state.paidAmount = undefined;
+        this.state.paidMethod = undefined;
+    }
+    //#endregion
+
+
 
 }
+

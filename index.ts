@@ -1,3 +1,3 @@
-import { YO } from './yo';
+import { scenario } from "./src/scenario";
 
-console.log(YO)
+scenario()
