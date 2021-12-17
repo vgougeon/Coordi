@@ -1,7 +1,7 @@
 import { delay, of, tap } from 'rxjs';
 import { Logic } from './logic';
 
-const api = new Logic()
+const api = new Logic((state: any) => { console.log(state)})
 
 export function scenario() {
     of(true)

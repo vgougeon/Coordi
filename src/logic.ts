@@ -147,5 +147,12 @@ export class Logic {
         this.state.paidMethod = undefined;
     }
     //#endregion
+
+    getState() {
+        return {
+            currentProduct: this.state.currentProduct,
+            
+        }
+    }
 }
 

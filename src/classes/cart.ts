@@ -20,7 +20,7 @@ export class Cart {
     public addProduct(product: Product, qty: number) {
         const inCart = this.products.find(pCart => pCart.product === product)
         if(inCart) { inCart.quantity += qty; console.log("already in cart") }
-        else this.products = [...this.products, new ProductCart(this, product, qty)]
+        else this.products = [...this.products, new ProductCart(product, qty)]
     }
 
     public returnProduct(product: Product, qty: number) {
