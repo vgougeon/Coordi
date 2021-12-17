@@ -147,8 +147,5 @@ export class Logic {
         this.state.paidMethod = undefined;
     }
     //#endregion
-
-
-
 }
 
