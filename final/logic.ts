@@ -18,6 +18,8 @@ export class Logic {
 
         paidAmount?: number;
         paidMethod?: string;
+
+        isFinished?: boolean;
     }
 
     constructor() {
@@ -31,62 +33,33 @@ export class Logic {
     }
 
     transition() {
+        const c = this.checkState.bind(this)
         //ADD
-        this.checkState('UNKNOWN', 'WAIT_FOR_SCAN', true)
-        this.checkState('WAIT_FOR_SCAN', 'WAIT_QUANTITY', this.isProductScanned())
-        this.checkState('WAIT_FOR_SCAN', 'WAIT_FOR_RETURN_SCAN', this.isReturnPressed())
-        this.checkState('WAIT_FOR_SCAN', 'UNKNOWN_PRODUCT', this.isUnknownProduct())
-        this.checkState('WAIT_QUANTITY', 'UPDATE_CART', this.isQuantityEntered())
-        this.checkState('UPDATE_CART', 'UNKNOWN', true)
+        c('UNKNOWN', 'WAIT_FOR_SCAN', true)
+        c('WAIT_FOR_SCAN', 'WAIT_QUANTITY', this.isProductScanned())
+        c('WAIT_FOR_SCAN', 'WAIT_FOR_RETURN_SCAN', this.isReturnPressed(), this.waitForReturnScanCallback)
+        c('WAIT_FOR_SCAN', 'UNKNOWN_PRODUCT', this.isUnknownProduct(), this.unknownProductCallback)
+        c('WAIT_QUANTITY', 'UPDATE_CART', this.isQuantityEntered(), this.updateCartCallback)
+        c('UPDATE_CART', 'UNKNOWN', true, this.finishCallback)
         //RETURN
-        this.checkState('WAIT_FOR_RETURN_SCAN', 'UNKNOWN_PRODUCT', this.isUnknownProduct())
-        this.checkState('WAIT_FOR_RETURN_SCAN', 'WAIT_RETURN_QUANTITY', this.isProductScanned())
-        this.checkState('WAIT_RETURN_QUANTITY', 'UPDATE_CART_RETURN', this.isQuantityEntered())
-        this.checkState('UPDATE_CART_RETURN', 'UNKNOWN', true)
+        c('WAIT_FOR_RETURN_SCAN', 'UNKNOWN_PRODUCT', this.isUnknownProduct(), this.unknownProductCallback)
+        c('WAIT_FOR_RETURN_SCAN', 'WAIT_RETURN_QUANTITY', this.isProductScanned())
+        c('WAIT_RETURN_QUANTITY', 'UPDATE_CART_RETURN', this.isQuantityEntered(), this.updateCartReturnCallback)
+        c('UPDATE_CART_RETURN', 'UNKNOWN', true, this.finishCallback)
         //ERRORS
-        this.checkState('UNKNOWN_PRODUCT', 'UNKNOWN', this.isOkPressed())
+        c('UNKNOWN_PRODUCT', 'UNKNOWN', this.isOkPressed(), this.finishCallback)
         //PAY
-        this.checkState('WAIT_FOR_SCAN', 'PAY', this.isPaySelectedAndAmount())
-        this.checkState('PAY', 'PAY_UPDATE_TOTAL', this.didPay())
-        this.checkState('PAY', 'ORDER_FINISH', this.isPayComplete())
-        this.checkState('PAY_UPDATE_TOTAL', 'PAY', true)
-
+        c('WAIT_FOR_SCAN', 'PAY', this.isPaySelectedAndAmount())
+        c('PAY', 'PAY_UPDATE_TOTAL', this.didPay(), this.payUpdateTotalCallback)
+        c('PAY', 'ORDER_FINISH', this.isPayComplete())
+        c('PAY_UPDATE_TOTAL', 'PAY', true)
     }
 
-    checkState(from: string, to: string, condition: boolean) {
+    checkState(from: string, to: string, condition: boolean, callback?: Function) {
         if (this.currentState === from && condition) {
-            this.setState(to)
+            this.currentState = to
+            if (callback) callback.bind(this)()
             console.debug(`${from} >>> ${to}`)
-        }
-    }
-
-    setState(state: string) {
-        this.currentState = state
-        switch (state) {
-            case 'UNKNOWN':
-                this.state.currentProduct = undefined;
-                this.state.quantity = undefined;
-                this.state.okPressed = undefined;
-                break;
-            case 'UPDATE_CART':
-                this.state.cart.addProduct(this.state.currentProduct!, this.state.quantity!)
-                this.state.totalPrice = this.state.cart.getPrice()
-                break;
-            case 'UPDATE_CART_RETURN':
-                this.state.cart.returnProduct(this.state.currentProduct!, this.state.quantity!)
-                this.state.totalPrice = this.state.cart.getPrice()
-                break;
-            case 'WAIT_FOR_RETURN_SCAN':
-                this.state.returnPressed = undefined
-                break;
-            case 'UNKNOWN_PRODUCT':
-                this.state.productNotFound = undefined
-                break;
-            case 'PAY_UPDATE_TOTAL':
-                this.state.totalPrice! -= this.state.paidAmount || 0
-                this.state.paidAmount = undefined;
-                this.state.paidMethod = undefined;
-                break;
         }
     }
 
@@ -94,7 +67,7 @@ export class Logic {
         this.state.currentProduct = PRODUCTS.find(p => p.code === code) || undefined
         if (!this.state.currentProduct) this.state.productNotFound = true
     }
-    quantity(amount: number) { this.state.quantity = amount;}
+    quantity(amount: number) { this.state.quantity = amount; }
     pressReturn() { this.state.returnPressed = true; }
     pressOk() { this.state.okPressed = true; }
     pressPay() { this.state.payPressed = true; }
@@ -105,12 +78,12 @@ export class Logic {
 
     //#region CONDITIONS
     didPay() {
-        if(this.state.paidAmount && this.state.paidMethod) return true
+        if (this.state.paidAmount && this.state.paidMethod) return true
         return false
     }
 
     isPayComplete() {
-        if((this.state.totalPrice || 0) <= 0) return true
+        if ((this.state.totalPrice || 0) <= 0) return true
         else return false
     }
 
@@ -123,7 +96,7 @@ export class Logic {
     }
 
     isPaySelectedAndAmount() {
-        if(this.state.payPressed && (this.state.totalPrice || 0) > 0) return true
+        if (this.state.payPressed && (this.state.totalPrice || 0) > 0) return true
         return false
     }
 
@@ -142,7 +115,38 @@ export class Logic {
     }
     //#endregion CONDTIONS
 
+    //#region CALLBACKS
+    finishCallback() {
+        this.state.currentProduct = undefined;
+        this.state.quantity = undefined;
+        this.state.okPressed = undefined;
+        this.state.isFinished = true
+    }
 
+    updateCartCallback() {
+        this.state.cart.addProduct(this.state.currentProduct!, this.state.quantity!)
+        this.state.totalPrice = this.state.cart.getPrice()
+    }
+
+    updateCartReturnCallback() {
+        this.state.cart.returnProduct(this.state.currentProduct!, this.state.quantity!)
+        this.state.totalPrice = this.state.cart.getPrice()
+    }
+    
+    waitForReturnScanCallback() {
+        this.state.returnPressed = undefined
+    }
+
+    unknownProductCallback() {
+        this.state.productNotFound = undefined
+    }
+
+    payUpdateTotalCallback() {
+        this.state.totalPrice! -= this.state.paidAmount || 0
+        this.state.paidAmount = undefined;
+        this.state.paidMethod = undefined;
+    }
+    //#endregion
 
 
 
