@@ -9,6 +9,7 @@ import CartComponent from './components/cart';
 import Keyboard from './components/keyboard';
 import { useState } from 'react';
 import { PayComponent } from './components/pay';
+import OkButton from './components/okButton';
 
 function App() {
   const currentState = useObservable(api.currentState$)
@@ -21,7 +22,7 @@ function App() {
     <>
       <header className="h-14 bg-gray-500 p-5 flex items-center text-white justify-between">
         <HiDotsHorizontal size={22} />
-        { currentState }
+        {currentState}
         <FaPowerOff size={22} />
       </header>
       <div className="flex m-3 space-x-4">
@@ -32,6 +33,14 @@ function App() {
           {(currentState === 'WAIT_FOR_SCAN' || currentState === 'WAIT_FOR_RETURN_SCAN') && <Scan />}
           {(currentState === 'WAIT_QUANTITY' || currentState === 'WAIT_FOR_RETURN_QUANTITY') && <Quantity />}
           {(currentState === 'PAY') && <PayComponent />}
+          {(currentState === 'UNKNOWN_PRODUCT') && <div className="p-4 flex flex-col items-center">
+            <h2 className="text-lg">Produit inconnu</h2>
+            <OkButton />
+          </div>}
+          {(currentState === 'ORDER_FINISH') && <div className="p-4 flex flex-col items-center">
+            <h2 className="text-lg">Paiement validé.</h2>
+            <OkButton />
+          </div>}
           {state?.currentProduct && <>
             <div className="flex items-center h-16 p-3 mt-5 bg-gray-200">
               <span className="font-semibold">{state.currentProduct.name}</span>

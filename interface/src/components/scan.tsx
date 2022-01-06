@@ -7,7 +7,7 @@ export default function Scan() {
   const [input, setInput] = useState('')
   return (
     <>
-      <input className="w-full h-14 p-3 border border-gray-200 shadow-sm"
+      <input className="w-full h-14 p-3 border border-gray-200 shadow-sm m-3 mb-0"
         type="text" value={input} placeholder="Scan code"
         onChange={(e) => setInput(e.target.value)} />
       <div className="flex">
@@ -15,9 +15,10 @@ export default function Scan() {
           onChange={(value: string) => setInput(value)} />
         <div className="grid grid-cols-3 w-full p-4 gap-3">
           {PRODUCTS.map(product =>
-            <div className="border border-gray-200 bg-white">
-              <img src={ product.image } className="w-full h-20 object-contain"/>
-              <div className="bg-gray-100">{ product.name }</div>
+            <div onClick={() => api.scan(product.code)}
+            className="border border-gray-200 bg-white justify-center flex relative hover:scale-105 cursor-pointer hover:border-blue-400">
+              <img src={ product.image } className="w-full object-cover h-44"/>
+              <div className="bg-white shadow border-t border-gray-200 h-10 flex items-center px-3 absolute bottom-0 w-full">{ product.name }</div>
             </div>
           )}
         </div>

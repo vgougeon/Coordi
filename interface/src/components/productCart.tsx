@@ -30,7 +30,9 @@ export default function ProductCartItem({ p }: { p: ProductCart }) {
                 </span>
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <a href="#" className="text-indigo-600 hover:text-indigo-900">Retour</a>
+                <a onClick={() => api.return(p)}
+                href="#" className="text-indigo-600 hover:text-indigo-900"
+                >Retour</a>
             </td>
         </tr>
     )
