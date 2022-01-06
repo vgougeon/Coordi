@@ -11,7 +11,7 @@ export default function Keyboard({onChange, onSubmit} : { onChange?: Function, o
     }
     const reset = () => { setValue(''); onChange?.('') }
     return (
-        <div className="grid grid-cols-3 w-fit gap-2 p-3">
+        <div className="grid grid-cols-3 w-fit gap-2 p-3 flex-shrink-0">
         { keys.map((item: number, index: number) =>
             <button onClick={() => set((index + 1).toString())}
             className="w-16 h-16 bg-white rounded border-gray-200 border">
