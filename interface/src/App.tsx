@@ -9,7 +9,6 @@ import CartComponent from './components/cart';
 
 function App() {
   const currentState = useObservable(api.currentState$)
-  const render = useRendersCount()
   const state: State = useObservable(api.state$)
   console.log(state?.cart.products.map((p) => ([p.product.name, p.quantity]).join(' - ')))
   const products = state?.cart.products || []
@@ -24,7 +23,7 @@ function App() {
         <div className="w-1/2">
           <CartComponent products={products} />
         </div>
-        <div className="w-1/2 h-[500px] bg-gray-50">
+        <div className="w-1/2 bg-gray-50">
           {(currentState === 'WAIT_FOR_SCAN' || currentState === 'WAIT_FOR_RETURN_SCAN') && <Scan />}
           {(currentState === 'WAIT_QUANTITY' || currentState === 'WAIT_FOR_RETURN_QUANTITY') && <Quantity />}
           {state?.currentProduct && <>
