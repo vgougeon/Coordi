@@ -22,7 +22,7 @@ export class Logic {
     currentState: string = 'UNKNOWN'
     state: State;
 
-    constructor(private observer: Function) {
+    constructor(public observer: Function) {
         this.state = {
             cart: new Cart(),
         }
