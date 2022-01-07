@@ -1,3 +1,4 @@
 import { Logic } from "./api/src/logic";
 
-export default new Logic(() => {})
+const api = new Logic(() => {})
+export default api

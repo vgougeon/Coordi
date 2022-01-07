@@ -1,8 +1,8 @@
-import { Props, useState } from "react"
-import api from '../api'
+import { useParams } from "react-router-dom"
 import { ProductCart } from "../api/src/classes/productCart"
+import orderService from "../services/order.service"
 
-export default function ProductCartItem({ p }: { p: ProductCart }) {
+export default function ProductCartItem({ p, id }: { p: ProductCart, id: number }) {
     return (
         <tr>
             <td className="px-6 py-4 whitespace-nowrap">
@@ -30,7 +30,7 @@ export default function ProductCartItem({ p }: { p: ProductCart }) {
                 </span>
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <a onClick={() => api.return(p)}
+                <a onClick={() => orderService.getOrder(id).return(p)}
                 href="#" className="text-indigo-600 hover:text-indigo-900"
                 >Retour</a>
             </td>

@@ -1,9 +1,27 @@
 import { Product } from './classes/product';
 
 export const PRODUCTS: Product[] = [
-    new Product(1, 'Pomme', 0.50, 'https://www.coteaux-nantais.com/sites/coteaux-nantais.com/files/pilot.png'),
-    new Product(2, 'Poire', 0.74, 'http://assets.stickpng.com/images/580b57fcd9996e24bc43c17d.png'),
-    new Product(3, 'Banane', 0.35, 'https://www.lifepng.com/wp-content/uploads/2020/11/Isolated-Banana-png-hd.png'),
-    new Product(4, 'Visseuse', 59.99, 'https://media.adeo.com/marketplace/LMFR/82253643/ffc92534-51f0-4b98-b266-e0122ba8a4d4.png'),
-]
-
+    new Product(1, 'Visseuse', 24.9, 'https://media.adeo.com/media/1664469/format/png?format=jpg&width=700'),
+    new Product(2, 'Perceuse', 41.9, 'https://media.adeo.com/media/1664515/format/png?format=jpg&width=700'),
+    new Product(3, 'Perforateur', 129.0, 'https://media.adeo.com/media/1664470/format/png?format=jpg&width=700'),
+    new Product(4, 'Ponceuse', 79.99, 'https://media.adeo.com/media/1664516/format/png?format=jpg&width=700'),
+    new Product(5, 'Polisseuse', 69.99, 'https://media.adeo.com/media/1664517/format/png?format=jpg&width=700'),
+    new Product(
+      6,
+      'Foret et mèche',
+      15.5,
+      'https://m1.lmcdn.fr/media/15/5eea2473475ea72daca3dd10_original/3265160300/foret-et-meche5eea2473dab3a5000976602f.jpg?format=jpg&width=700'
+    ),
+    new Product(
+      7,
+      'Scrie électrique',
+      187.0,
+      'https://m1.lmcdn.fr/media/15/5d761744b7c505196cf83a94/357229863/famille-scie-electrique-stationnaire5d76090f9f49ff00094806b6.jpg?format=jpg&width=700'
+    ),
+    new Product(
+      8,
+      'Tronçonneuse à métaux',
+      279.0,
+      'https://m1.lmcdn.fr/media/15/5d7618803711266606846c65/357545486/famille-tronconneuse-a-metaux5d7618800ab56b00097c23b5.jpg?format=jpg&width=700'
+    ),
+  ];
