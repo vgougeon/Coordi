@@ -1,3 +1,5 @@
+import { ProductCart } from './classes/productCart';
+import { BehaviorSubject } from 'rxjs';
 import { Cart } from './classes/cart';
 import { Product } from './classes/product';
 import { PRODUCTS } from './data';
@@ -8,6 +10,7 @@ export interface State {
     cart: Cart;
     totalPrice?: number;
 
+    productToReturn?: ProductCart;
     returnPressed?: boolean;
     okPressed?: boolean;
     payPressed?: boolean;
@@ -22,10 +25,14 @@ export class Logic {
     currentState: string = 'UNKNOWN'
     state: State;
 
+    state$ = new BehaviorSubject<any>({})
+    currentState$ = new BehaviorSubject<any>('UNKNOWN')
+
     constructor(private observer: Function) {
         this.state = {
             cart: new Cart(),
         }
+        this.state$.next(this.state)
 
         this.transition()
         setInterval(this.transition.bind(this), 50)
@@ -38,6 +45,8 @@ export class Logic {
         c('WAIT_FOR_SCAN', 'WAIT_QUANTITY', this.isProductScanned())
         c('WAIT_FOR_SCAN', 'WAIT_FOR_RETURN_SCAN', this.isReturnPressed(), this.waitForReturnScanCallback)
         c('WAIT_FOR_SCAN', 'UNKNOWN_PRODUCT', this.isUnknownProduct(), this.unknownProductCallback)
+        c('WAIT_FOR_SCAN', 'RETURN_PRODUCT', this.isProductToReturn(), this.productReturnCallback)
+        c('RETURN_PRODUCT', 'UNKNOWN', true)
         c('WAIT_QUANTITY', 'UPDATE_CART', this.isQuantityEntered(), this.updateCartCallback)
         c('UPDATE_CART', 'UNKNOWN', true, this.finishCallback)
         //RETURN
@@ -58,7 +67,8 @@ export class Logic {
         if (this.currentState === from && condition) {
             this.currentState = to
             if (callback) callback.bind(this)()
-            this.observer(this.state, this.currentState)
+            this.state$.next(this.state)
+            this.currentState$.next(this.currentState)
             console.debug(`${from} >>> ${to}`)
             this.transition()
         }
@@ -67,14 +77,20 @@ export class Logic {
     scan(code: number) {
         this.state.currentProduct = PRODUCTS.find(p => p.code === code) || undefined
         if (!this.state.currentProduct) this.state.productNotFound = true
+        this.transition()
     }
-    quantity(amount: number) { this.state.quantity = amount; }
-    pressReturn() { this.state.returnPressed = true; }
-    pressOk() { this.state.okPressed = true; }
-    pressPay() { this.state.payPressed = true; }
+    quantity(amount: number) { this.state.quantity = amount; this.transition() }
+    pressReturn() { this.state.returnPressed = true; this.transition() }
+    pressOk() { this.state.okPressed = true; this.transition() }
+    pressPay() { this.state.payPressed = true; this.transition() }
+    return(productCart: ProductCart) {
+        this.state.productToReturn = productCart;
+        this.transition()
+    }
     pay(amount: number, method: string) {
         this.state.paidAmount = amount;
         this.state.paidMethod = method;
+        this.transition()
     }
 
     //#region CONDITIONS
@@ -86,6 +102,11 @@ export class Logic {
     isPayComplete() {
         if ((this.state.totalPrice || 0) <= 0) return true
         else return false
+    }
+
+    isProductToReturn() {
+        if(this.state.productToReturn) return true
+        return false
     }
 
     isReturnPressed() {
@@ -122,6 +143,11 @@ export class Logic {
         this.state.quantity = undefined;
         this.state.okPressed = undefined;
         this.state.isFinished = true
+    }
+
+    productReturnCallback() {
+        this.state.cart.returnProduct(this.state.productToReturn!.product, this.state.productToReturn!.quantity)
+        this.state.productToReturn = undefined
     }
 
     updateCartCallback() {

@@ -18,6 +18,7 @@ export class Cart {
     }
 
     public addProduct(product: Product, qty: number) {
+        if(qty < 1) return
         const inCart = this.products.find(pCart => pCart.product === product)
         if(inCart) { inCart.quantity += qty; console.log("already in cart") }
         else this.products = [...this.products, new ProductCart(product, qty)]
