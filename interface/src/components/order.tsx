@@ -18,24 +18,38 @@ export default function Order({ id }: { id: number }) {
                     <div className="w-1/2">
                         <CartComponent id={id} />
                     </div>
-                    <div className="w-1/2 bg-gray-50">
-                        {(currentState === 'WAIT_FOR_SCAN' || currentState === 'WAIT_FOR_RETURN_SCAN') && <Scan id={id} />}
-                        {(currentState === 'WAIT_QUANTITY' || currentState === 'WAIT_FOR_RETURN_QUANTITY') && <Quantity id={id} />}
-                        {(currentState === 'PAY') && <PayComponent id={id} />}
-                        {(currentState === 'UNKNOWN_PRODUCT') && <div className="p-4 flex flex-col items-center">
-                            <h2 className="text-lg">Produit inconnu</h2>
-                            <OkButton id={id} />
-                        </div>}
-                        {(currentState === 'ORDER_FINISH') && <div className="p-4 flex flex-col items-center">
-                            <h2 className="text-lg">Paiement validé.</h2>
-                            <OkButton id={id} />
-                        </div>}
-                        {state?.currentProduct && <>
-                            <div className="flex items-center h-16 p-3 mt-5 bg-gray-200">
-                                <span className="font-semibold">{state.currentProduct.name}</span>
-                                <img src={state.currentProduct.image} className="object-contain w-[50px]"></img>
+                    <div className="w-1/2">
+                        <div className="bg-gray-50 d-flex shadow">
+                            <div className="flex w100">
+                                {(currentState === 'WAIT_FOR_SCAN' || currentState === 'WAIT_FOR_RETURN_SCAN') && <Scan id={id} />}
+                                {(currentState === 'WAIT_QUANTITY' || currentState === 'WAIT_FOR_RETURN_QUANTITY') && <Quantity id={id} />}
+                                {(currentState === 'PAY') && <PayComponent id={id} />}
+                                {(currentState === 'UNKNOWN_PRODUCT') && <div className="p-4 flex flex-col items-center">
+                                    <h2 className="text-lg">Produit inconnu</h2>
+                                    <OkButton id={id} />
+                                </div>}
+
                             </div>
-                        </>}
+                            {(currentState === 'ORDER_FINISH') && <div className="p-4 flex flex-col items-center">
+                                <h2 className="text-lg">Paiement validé.</h2>
+                                <OkButton id={id} />
+                            </div>}
+                            {/* {state?.currentProduct && <>
+                                <div className="flex items-center h-16 p-3 mt-5 bg-gray-200">
+                                    <span className="font-semibold">{state.currentProduct.name}</span>
+                                    <img src={state.currentProduct.image} className="object-contain w-[50px]"></img>
+                                </div>
+                            </>} */}
+                        </div>
+                        <div className="flex items-center px-5 font-semibold flex-col py-4 bg-gray-50 mt-4 shadow">
+                            <span>Total : { state?.cart?.getPrice().toFixed(2)}€</span>
+                            <span className="text-sm opacity-75">{ state?.cart?.products.length } articles</span>
+                            { currentState === 'WAIT_FOR_SCAN' &&
+                            <button onClick={() => orderService.getOrder(id).pressPay()}
+                            className="my-4 border-2 border-green-400 h-12 rounded px-8 bg-green-600 hover:bg-green-500 hover:border-white shadow text-white flex items-center">
+                                Payer
+                            </button> }
+                        </div>
                     </div>
                 </div>
             </div>
