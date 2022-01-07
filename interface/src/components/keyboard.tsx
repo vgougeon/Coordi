@@ -15,16 +15,16 @@ export default function Keyboard({onChange, onSubmit} : { onChange?: Function, o
         { keys.map((item: number, index: number) =>
             <button key={index}
             onClick={() => set((index + 1).toString())}
-            className="w-16 h-16 bg-white rounded border-gray-200 border">
+            className="secondary w-16 h-16 bg-white rounded border-gray-200 border">
                 { index + 1 }
             </button>
         )}
         <button onClick={() => reset()}
-        className="w-16 h-16 bg-white rounded border-gray-200 border flex items-center justify-center"><ImCancelCircle /></button>
+        className="w-16 h-16 border border-gray-300 bg-white rounded flex items-center justify-center"><ImCancelCircle /></button>
         <button onClick={() => set((0).toString())}
-        className="w-16 h-16 bg-white rounded border-gray-200 border flex items-center justify-center">0</button>
+        className="secondary w-16 h-16 bg-white rounded flex items-center justify-center">0</button>
         <button onClick={() => onSubmit?.(value)}
-        className="w-16 h-16 bg-white rounded border-gray-200 border flex items-center justify-center"><BsCheckLg /></button>
+        className="primary w-16 h-16 bg-white rounded flex items-center justify-center"><BsCheckLg /></button>
         </div>
     )
 }

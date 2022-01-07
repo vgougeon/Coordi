@@ -2,7 +2,6 @@ import { useState } from "react";
 import Keyboard from "../components/keyboard";
 import { useNavigate } from 'react-router-dom'
 import orderService from "../services/order.service";
-import Header from "../layout/header";
 
 export default function LoginPage() {
     const [code, setCode] = useState('')
@@ -15,8 +14,7 @@ export default function LoginPage() {
     }
     return (
         <>
-            <Header />
-            <div className="py-5 w-full flex justify-center items-center flex-col">
+            <div className="mt-5 py-5 w-full flex justify-center items-center flex-col">
                 <input type="text" value={code} readOnly
                     className="h-16 text-lg text-center bg-white shadow border broder-gray-200 font-semibold" />
                 <Keyboard onSubmit={(val: string) => login(val)}
