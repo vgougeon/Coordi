@@ -19,6 +19,7 @@ jobs:
       with:
         node-version: '16.x'
         cache: 'npm'
+        cache-dependency-path: interface/package-lock.json
     - name: "NPM CI"
       run: npm ci
       working-directory: ./interface
