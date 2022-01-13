@@ -11,10 +11,10 @@ const customStyles = {
   content: {
     boxShadow: '0 6px 8px 0 rgb(0 0 0 / 10%), 0 5px 12px 4px rgb(0 0 0 / 15%)',
     borderRadius: '10px',
-    inset:'50% 80px 10px 50%',
+    inset:'40% 80px 10px 50%',
     top: '50%',
     left: '50%',
-    transform: 'translate(-50%, -50%)',
+    transform: 'translate(-50%, -40%)',
     width: '80%',
   },
 };
