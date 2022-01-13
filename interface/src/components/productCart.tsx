@@ -1,9 +1,27 @@
+import { useState } from 'react';
 import { BsFillTrashFill } from 'react-icons/bs';
+import Modal from 'react-modal';
 import { useParams } from 'react-router-dom';
 import { ProductCart } from '../api/src/classes/productCart';
 import orderService from '../services/order.service';
+import ConfirmModal from './confirmModal';
+
+const customStyles = {
+    content: {
+        boxShadow: '0 6px 8px 0 rgb(0 0 0 / 10%), 0 5px 12px 4px rgb(0 0 0 / 15%)',
+        borderRadius: '10px',
+        inset:'69% 10px 20px 50%',
+        top: '20%',
+        left: '50%',
+        transform: 'translate(-50%, -150%)',
+        width: '40%',
+    },
+};
+
+Modal.setAppElement('#root');
 
 export default function ProductCartItem({ p, id }: { p: ProductCart; id: number }) {
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <tr>
       <td className='px-6 py-4 whitespace-nowrap'>
@@ -27,10 +45,19 @@ export default function ProductCartItem({ p, id }: { p: ProductCart; id: number 
         </span>
       </td>
       <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-s4 text-red'>
-        <a onClick={() => orderService.getOrder(id).return(p)} href='#'>
+        <a onClick={() => setIsOpen(true)} href='#'>
           <BsFillTrashFill />
         </a>
       </td>
+      <Modal
+        isOpen={isOpen}
+        // onAfterOpen={afterOpenModal}
+        onRequestClose={() => setIsOpen(false)}
+        style={customStyles}
+        contentLabel='Example Modal'
+      >
+          <ConfirmModal id={id} product={p} close={() => setIsOpen(false)}/>
+      </Modal>
     </tr>
   );
 }
