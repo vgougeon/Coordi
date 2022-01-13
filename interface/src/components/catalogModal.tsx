@@ -5,7 +5,7 @@ import orderService from '../services/order.service';
 import { PRODUCTS } from "../api/src/data";
 
 export default function CatalogModal({ id, close, product }: any) {
-  const [selected, setSelected] = useState('CARD');
+  const [selected, setSelected] = useState('');
   const state: State = useObservable(orderService.getOrder(id).state$);
   const removeItem = () => {
     orderService.getOrder(id).return(product)
@@ -13,29 +13,27 @@ export default function CatalogModal({ id, close, product }: any) {
   }
   
   const categories = new Set(PRODUCTS.map( product => product.category))
-  function switchCateg(){
-    console.log('halo')
-  }
   return (
     <div className='flex flex-col items-center'>
-      <div className="flex">
-        <div className="categories flex-col flex">
+      <div className="flex w-full space-x-4">
+        <div className="categories flex-col flex w-1/3">
+        <a href="#" className={`btn  rounded-2 shadow-1 min-w-full mb-3 p-4 bg-[#607790] text-white text-left ${selected==="" ? "bg-[#2E4C6D]": "bg-[#607790]"}`} onClick={() => setSelected("") }>Produits rapide</a>
           {Array.from(categories).map(category =>
-            <div onClick={() => switchCateg()}>{ category }</div>  
+            <a href="#" className={`btn  rounded-2 shadow-1 min-w-full mb-3 p-4 bg-[#607790] text-white text-left ${selected===category ? "bg-[#2E4C6D]": "bg-[#607790]"}`} onClick={() => setSelected(category) }>{ category }</a>  
           )}
         </div>
-        <div className="grid grid-cols-3 w-full p-4 gap-3">
-          {PRODUCTS.map(product =>
+        <div className="grid grid-cols-3 w-full gap-3 items-start">
+          {PRODUCTS.filter(p => (selected === p.category) || (selected === "")).map(product =>
             <div key={ product.code } onClick={() => orderService.getOrder(id).scan(product.code)}
-            className="border border-gray-200 bg-white justify-center flex relative hover:scale-105 cursor-pointer hover:border-blue-400 rounded-2">
+            className="border border-gray-200 bg-white justify-center flex relative cursor-pointer hover:border-blue-400 rounded-2">
               <img src={ product.image } className="w-full object-contain h-44 rounded-2"/>
-              <div  style={{ borderBottomLeftRadius: "10px;", borderBottomRightRadius: "10px;" }} className="bg-white shadow border-t border-gray-200 h-10 flex items-center px-3 absolute bottom-0 w-full" >{ product.name }</div>
+              <div  style={{ borderBottomLeftRadius: "10px", borderBottomRightRadius: "10px", background: 'rgba(0,0,0,0.5)', color: 'white', textAlign: 'center', borderTop: 'none'}} className="justify-center bg-white shadow border-t border-gray-200 h-10 flex items-center px-3 absolute bottom-0 w-full" >{ product.name }</div>
             </div>
           )}
         </div>
       </div>
       <div className='flex justify-between w-full mt-5'>
-        <button onClick={close} className="btn secondary rounded-2 shadow-1 ml-5">{'<'} Retour</button>
+        <button onClick={close} className="btn secondary rounded-2 shadow-1">{'<'} Retour</button>
         {/* <a
           href="#"
           onClick={removeItem} 
