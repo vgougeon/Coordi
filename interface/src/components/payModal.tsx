@@ -46,7 +46,7 @@ export default function PayModal({ id, close }: any) {
           <span className="font-s5 p-2 font-w800"> {((state?.totalPrice || 0) - (state?.paidAmount || 0)).toFixed(2)}€</span>
         </span>
         <button
-          onClick={() => {orderService.getOrder(id).pay(state.totalPrice || 0, 'cash')}} 
+          onClick={() => {orderService.getOrder(id).pay(state.totalPrice || 0, selected)}} 
           className="btn success rounded-1 shadow-1">Payer {'>'}</button>
       </div>
     </div>
