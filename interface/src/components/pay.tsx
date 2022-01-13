@@ -5,17 +5,15 @@ import Keyboard from './keyboard';
 import { useParams } from 'react-router-dom';
 import orderService from '../services/order.service';
 import Modal from 'react-modal';
-import PayModal from './modal';
+import PayModal from './payModal';
 
 const customStyles = {
   content: {
+    inset:'50% 80px 15px 50%',
     top: '50%',
     left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
-    width: '40%',
+    width: '80%',
   },
 };
 
@@ -30,7 +28,6 @@ export function PayComponent({ id }: { id: number }) {
   };
   return (
     <div className='p-4'>
-      <button className='bg-green-500 text-white rounded flex items-center px-5 py-2'>Payer</button>
       <Modal
         isOpen={modalIsOpen}
         // onAfterOpen={afterOpenModal}
@@ -38,7 +35,7 @@ export function PayComponent({ id }: { id: number }) {
         style={customStyles}
         contentLabel='Example Modal'
       >
-        <PayModal id={id} />
+        <PayModal close={() => setIsOpen(false)} id={id} />
       </Modal>
     </div>
   );

@@ -15,6 +15,11 @@ export class OrderService {
         console.log(this.orders)
         return this.id
     }
+
+    deleteOrder(id: number) {
+        delete this.orders[id];
+        this.ordersList$.next(Object.keys(this.orders))
+    }
 }
 
 export default new OrderService()

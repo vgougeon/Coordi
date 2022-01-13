@@ -57,21 +57,24 @@ export default function Header() {
     <header className='h-14 bg-gray-500 p-5 flex items-center text-white justify-between'>
       <HiDotsHorizontal size={22} />
       <div className='flex space-x-4 items-center'>
-        {orders?.map((order) => (
-          <Link to={`/order/${order}`}>
-            <div
-              className={`px-5 h-9 flex items-center bg-opacity-20 bg-white ${order == active && 'border border-white'}
-                        rounded hover:bg-opacity-40 cursor-pointer hover:text-white`}
-            >
-              Commande #{order}
-            </div>
-          </Link>
-        ))}
+        <div className="flex" style={{ maxWidth: '550px', overflowX: 'scroll' }}>
+          {orders?.map((order) => (
+            <Link key={order} to={`/order/${order}`}>
+              <div
+                style={{ justifyContent: 'center', minWidth: '90px' }}
+                className={`m-3 px-3 h-9 flex items-center bg-opacity-20 bg-white ${order == active && 'primary border border-white'}
+                          rounded hover:bg-opacity-40 cursor-pointer hover:text-white`}
+              >
+                Clt #{order}
+              </div>
+            </Link>
+          ))}
+        </div>
         <div
           onClick={createOrder}
           className='px-5 h-9 flex items-center bg-opacity-20 bg-white rounded hover:bg-opacity-40 cursor-pointer hover:text-white'
         >
-          <IoMdAdd />
+          Nouveau client
         </div>
         <div className='date'>{dateValue}</div>
         <Link to='/'>
