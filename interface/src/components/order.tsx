@@ -9,6 +9,8 @@ import orderService from "../services/order.service"
 import Header from "../layout/header"
 import { useEffect } from "react"
 import { useNavigate } from "react-router"
+import WaitPayAmount from "./waitPayAmount"
+import UnknownProductModal from "./unknownProductModal"
 export default function Order({ id }: { id: number }) {
     const currentState = useObservable(orderService.getOrder(id).currentState$)
     const state: State = useObservable(orderService.getOrder(id).state$)
@@ -36,11 +38,8 @@ export default function Order({ id }: { id: number }) {
                                 {(currentState === 'WAIT_FOR_SCAN' || currentState === 'WAIT_FOR_RETURN_SCAN' || currentState == 'PAY') && <Scan id={id} />}
                                 {(currentState === 'WAIT_QUANTITY' || currentState === 'WAIT_FOR_RETURN_QUANTITY') && <Quantity id={id} />}
                                 {(currentState === 'PAY') && <PayComponent id={id} />}
-                                {(currentState === 'UNKNOWN_PRODUCT') && <div className="p-4 flex flex-col items-center">
-                                    <h2 className="text-lg">Produit inconnu</h2>
-                                    <OkButton id={id} />
-                                </div>}
-
+                                {(currentState === 'PAY_WAIT_AMOUNT') && <WaitPayAmount id={id} />}
+                                {(currentState === 'UNKNOWN_PRODUCT') && <UnknownProductModal id={id} />}
                             </div>
                             {(currentState === 'ORDER_FINISH') && <div className="p-4 flex flex-col items-center">
                                 <h2 className="text-lg">Paiement validé.</h2>

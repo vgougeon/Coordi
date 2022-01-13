@@ -33,6 +33,12 @@ export default function PayModal({ id, close }: any) {
         />
       </div>
       <div className='flex justify-between w-full mt-5'>
+        <div></div>
+        <button
+          onClick={() => {orderService.getOrder(id).pressPayAmount()}} 
+          className="btn success rounded-1 shadow-1">Payer une partie</button>
+      </div>
+      <div className='flex justify-between w-full mt-2'>
         <button onClick={close} className="btn secondary rounded-1 shadow-1">{'<'} Retour</button>
         <span className="shadow-1 rounded-1 text-secondary d-flex vcenter">
           <div className="font-s3 p-2">Reste à payer</div>

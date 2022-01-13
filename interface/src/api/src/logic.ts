@@ -15,6 +15,7 @@ export interface State {
     okPressed?: boolean;
     payPressed?: boolean;
     productNotFound?: boolean;
+    payAmountPressed?: boolean;
 
     paidAmount?: number;
     paidMethod?: string;
@@ -38,6 +39,11 @@ export class Logic {
         setInterval(this.transition.bind(this), 50)
     }
 
+    reset() {
+        this.state.payAmountPressed = undefined;
+        this.state.payPressed = undefined;
+    }
+
     transition() {
         const c = this.checkState.bind(this)
         //ADD
@@ -58,9 +64,13 @@ export class Logic {
         c('UNKNOWN_PRODUCT', 'UNKNOWN', this.isOkPressed(), this.finishCallback)
         //PAY
         c('WAIT_FOR_SCAN', 'PAY', this.isPaySelectedAndAmount())
+        c('PAY', 'PAY_WAIT_AMOUNT', this.isPayAmountPressed(), this.payUpdateTotalCallback)
+        c('PAY_WAIT_AMOUNT', 'PAY_UPDATE_TOTAL', this.didPay(), this.payUpdateTotalCallback)
         c('PAY', 'PAY_UPDATE_TOTAL', this.didPay(), this.payUpdateTotalCallback)
         c('PAY', 'ORDER_FINISH', this.isPayComplete())
         c('PAY_UPDATE_TOTAL', 'PAY', true)
+
+        this.reset()
     }
 
     checkState(from: string, to: string, condition: boolean, callback?: Function) {
@@ -83,6 +93,7 @@ export class Logic {
     pressReturn() { this.state.returnPressed = true; this.transition() }
     pressOk() { this.state.okPressed = true; this.transition() }
     pressPay() { this.state.payPressed = true; this.transition() }
+    pressPayAmount() { this.state.payAmountPressed = true; this.transition() }
     return(productCart: ProductCart) {
         this.state.productToReturn = productCart;
         this.transition()
@@ -92,6 +103,8 @@ export class Logic {
         this.state.paidMethod = method;
         this.transition()
     }
+
+    
 
     //#region CONDITIONS
     didPay() {
@@ -115,6 +128,10 @@ export class Logic {
 
     isOkPressed() {
         return !!this.state.okPressed
+    }
+
+    isPayAmountPressed() {
+        return !!this.state.payAmountPressed
     }
 
     isPaySelectedAndAmount() {
@@ -172,6 +189,7 @@ export class Logic {
         this.state.totalPrice! -= this.state.paidAmount || 0
         this.state.paidAmount = undefined;
         this.state.paidMethod = undefined;
+        this.state.payAmountPressed = undefined;
     }
     //#endregion
 }
