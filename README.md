@@ -4,10 +4,10 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Team members
 
-ALZONNE Thomas
-COSTES Romain
-EMMERY Jean
-DI MARCO,GOUGEON,LEVEQUE Vincent
+- ALZONNE Thomas
+- COSTES Romain
+- EMMERY Jean
+- DI MARCO,GOUGEON,LEVEQUE Vincent
 
 ## Available Scripts
 
