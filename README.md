@@ -2,6 +2,13 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Team members
+
+ALZONNE Thomas
+COSTES Romain
+EMMERY Jean
+DI MARCO,GOUGEON,LEVEQUE Vincent
+
 ## Available Scripts
 
 In the project directory, you can run:
